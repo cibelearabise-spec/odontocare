@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OdontoCare - Início</title>
+<link rel="stylesheet" href="style.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <div class="phone">
+
+    <div class="header-row">
+      <div class="header-left">
+        <div class="avatar-sm"></div>
+        <div>
+          <p class="greeting">Good morning</p>
+          <p class="username">Sarah Johnson</p>
+        </div>
+      </div>
+      <button class="bell-btn">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <span class="bell-dot"></span>
+      </button>
+    </div>
+
+    <div class="search-bar">
+      <ion-icon name="search-outline" style="color:#6B6873;"></ion-icon>
+      <input type="text" id="search-input" placeholder="Search dentists..." />
+      <button class="search-btn"><ion-icon name="search"></ion-icon></button>
+    </div>
+
+    <a href="appointment.html" class="upcoming-card">
+      <p class="eyebrow">UPCOMING APPOINTMENT</p>
+      <div class="upcoming-row">
+        <div>
+          <p class="upcoming-doctor">Dra. Emma<br>Wilson</p>
+          <span class="time-chip">Tomorrow · 10:00 AM</span>
+        </div>
+        <div class="upcoming-avatar"><ion-icon name="person"></ion-icon></div>
+      </div>
+    </a>
+
+    <div class="section-header">
+      <h2 class="section-title">Especialidades</h2>
+    </div>
+    <div class="specialties-scroll" id="specialties-scroll"></div>
+
+    <div class="section-header">
+      <h2 class="section-title">Top Dentists</h2>
+    </div>
+
+    <div id="doctor-list"></div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active"><ion-icon name="home"></ion-icon></button>
+      <button class="nav-item"><ion-icon name="search-outline"></ion-icon></button>
+      <a href="appointment.html" class="nav-item"><ion-icon name="calendar-outline"></ion-icon></a>
+      <a href="profile.html" class="nav-item"><ion-icon name="person-outline"></ion-icon></a>
+    </nav>
+
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script type="module">
+    import { getApprovedDentists } from './firebase-init.js';
+
+    // Renderiza o carrossel de especialidades (usa data.js, estático)
+    const specialtiesEl = document.getElementById('specialties-scroll');
+    specialtiesEl.innerHTML = SPECIALTIES.map((s) => `
+      <a href="specialty.html?tipo=${encodeURIComponent(s.key)}" class="specialty-item">
+        <div class="specialty-circle" style="background:${s.bg};">${s.emoji}</div>
+        <span class="specialty-label">${s.key}</span>
+      </a>
+    `).join('');
+
+    // Busca os dentistas aprovados de verdade no Firestore
+    const listEl = document.getElementById('doctor-list');
+    listEl.innerHTML = '<p class="empty-state"><span>Carregando dentistas...</span></p>';
+
+    getApprovedDentists(null, 50)
+      .then((allDoctors) => {
+        const topDoctors = allDoctors.slice(0, 3);
+        renderDoctorList(listEl, topDoctors);
+        setupSearch(document.getElementById('search-input'), listEl, allDoctors, topDoctors);
+      })
+      .catch((err) => {
+        listEl.innerHTML = `<p class="empty-state"><span>Não foi possível carregar os dentistas (${err.message}). Confira se o firebase-config.js foi preenchido.</span></p>`;
+      });
+  </script>
+</body>
+</html>
