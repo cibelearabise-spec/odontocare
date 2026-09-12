@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OdontoCare - Entrar</title>
+<link rel="stylesheet" href="style.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <div class="phone login-phone">
+
+    <div class="login-hero">
+      <div class="login-logo">
+        <ion-icon name="medkit"></ion-icon>
+      </div>
+      <h1 class="login-title">OdontoCare</h1>
+      <p class="login-subtitle">Cuide da sua saúde em poucos toques</p>
+    </div>
+
+    <form class="login-form" id="login-form">
+      <label class="field-label" for="email">E-mail</label>
+      <div class="field">
+        <ion-icon name="mail-outline"></ion-icon>
+        <input type="email" id="email" placeholder="voce@email.com" required />
+      </div>
+
+      <label class="field-label" for="password">Senha</label>
+      <div class="field">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <input type="password" id="password" placeholder="••••••••" required />
+      </div>
+
+      <a href="#" class="forgot-link">Esqueceu a senha?</a>
+
+      <button type="submit" class="primary-btn">Entrar</button>
+
+      <p class="signup-text">
+        Não tem conta? <a href="#" class="signup-link">Criar conta</a>
+      </p>
+    </form>
+
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      // Demo: sem back-end real, só navega para a tela inicial.
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
