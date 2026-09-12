@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OdontoCare - Meu Perfil</title>
+<link rel="stylesheet" href="style.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <div class="phone">
+
+    <div class="top-bar">
+      <a href="index.html" class="icon-btn"><ion-icon name="arrow-back"></ion-icon></a>
+      <h1>Meu Perfil</h1>
+      <div class="icon-btn" style="visibility:hidden;"></div>
+    </div>
+
+    <div id="content">
+      <p class="empty-state"><span>Carregando...</span></p>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { auth, onAuthStateChanged, getDentistProfile, logoutDentist } from './firebase-init.js';
+
+    const content = document.getElementById('content');
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const profile = await getDentistProfile(user.uid);
+      if (!profile) {
+        content.innerHTML = '<p class="empty-state"><span>Perfil não encontrado.</span></p>';
+        return;
+      }
+
+      const statusHTML = profile.approved
+        ? `<div class="status-approved">✔️ Cadastro aprovado — você já aparece no app</div>`
+        : `<div class="status-pending">⏳ Cadastro em análise. Um administrador confere seu CRO antes de liberar sua exibição para pacientes.</div>`;
+
+      content.innerHTML = `
+        <div class="profile-avatar"><ion-icon name="person"></ion-icon></div>
+        <p class="profile-name">${profile.name}</p>
+        <p class="profile-cro">${profile.cro}</p>
+        ${statusHTML}
+        <div class="info-card">
+          <div class="info-row"><span>Especialidade</span><strong>${profile.specialty || '—'}</strong></div>
+          <div class="info-row"><span>Clínica</span><strong>${profile.clinic || '—'}</strong></div>
+          <div class="info-row"><span>E-mail</span><strong>${profile.email}</strong></div>
+        </div>
+        <button id="logout-btn" class="logout-btn">Sair</button>
+      `;
+
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        await logoutDentist();
+        window.location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>
