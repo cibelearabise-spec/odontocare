@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OdontoCare - Cadastro de Dentista</title>
+<link rel="stylesheet" href="style.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <div class="phone">
+
+    <a href="login.html" class="icon-btn"><ion-icon name="arrow-back"></ion-icon></a>
+
+    <h1 class="signup-title">Cadastro de Dentista</h1>
+    <p class="signup-subtitle">
+      App exclusivo para dentistas. Seu cadastro passa por aprovação manual antes de aparecer
+      para os pacientes.
+    </p>
+
+    <form class="login-form" id="signup-form">
+      <label class="field-label" for="name">Nome completo</label>
+      <div class="field"><input type="text" id="name" placeholder="Dra. Ana Souza" required /></div>
+
+      <label class="field-label" for="cro">CRO</label>
+      <div class="field"><input type="text" id="cro" placeholder="CRO-SP 12345" required /></div>
+
+      <label class="field-label" for="clinic">Clínica / Consultório</label>
+      <div class="field"><input type="text" id="clinic" placeholder="Clínica Sorriso" /></div>
+
+      <label class="field-label" for="specialty">Especialidade</label>
+      <div class="field">
+        <select id="specialty" required style="width:100%; border:none; background:transparent; font-family:inherit; font-size:14px; color:var(--ink); outline:none;">
+          <option value="" disabled selected>Selecione...</option>
+        </select>
+      </div>
+
+      <label class="field-label" for="email">E-mail</label>
+      <div class="field"><input type="email" id="email" placeholder="voce@email.com" required /></div>
+
+      <label class="field-label" for="password">Senha</label>
+      <div class="field"><input type="password" id="password" placeholder="Mínimo 6 caracteres" required /></div>
+
+      <button type="submit" class="primary-btn" id="submit-btn" style="margin-top: 20px;">Enviar cadastro</button>
+
+      <p class="signup-text">
+        Já tem conta? <a href="login.html" class="signup-link">Entrar</a>
+      </p>
+    </form>
+
+    <div id="feedback" class="feedback-box" style="display:none;"></div>
+
+  </div>
+
+  <script type="module">
+    import { signUpDentist } from './firebase-init.js';
+
+    const SPECIALTY_KEYS = [
+      'Ortodontia',
+      'Endodontia',
+      'Implantodontia',
+      'Periodontia',
+      'Odontopediatria',
+      'Cirurgia e Traumatologia Buco-Maxilo-Facial',
+      'Dentística',
+      'Harmonização Orofacial',
+      'Prótese',
+      'Estomatologia',
+    ];
+
+    const select = document.getElementById('specialty');
+    SPECIALTY_KEYS.forEach((key) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = key;
+      select.appendChild(opt);
+    });
+
+    const form = document.getElementById('signup-form');
+    const feedback = document.getElementById('feedback');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      try {
+        await signUpDentist({
+          name: document.getElementById('name').value,
+          cro: document.getElementById('cro').value,
+          clinic: document.getElementById('clinic').value,
+          specialty: select.value,
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value,
+        });
+        form.style.display = 'none';
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-box feedback-success';
+        feedback.innerHTML = `
+          <strong>Cadastro enviado!</strong><br>
+          Um administrador vai conferir seu CRO antes de liberar sua exibição no app.
+          <br><br><a href="profile.html">Ver status do meu cadastro</a>
+        `;
+      } catch (err) {
+        feedback.style.display = 'block';
+        feedback.className = 'feedback-box feedback-error';
+        feedback.textContent = 'Erro ao cadastrar: ' + err.message;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar cadastro';
+      }
+    });
+  </script>
+</body>
+</html>
