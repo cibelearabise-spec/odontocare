@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OdontoCare - Especialidade</title>
+<link rel="stylesheet" href="style.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <div class="phone">
+
+    <div class="top-bar">
+      <a href="index.html" class="icon-btn"><ion-icon name="arrow-back"></ion-icon></a>
+      <h1 id="specialty-title">Especialidade</h1>
+      <div class="icon-btn" style="visibility:hidden;"></div>
+    </div>
+
+    <div class="search-bar">
+      <ion-icon name="search-outline" style="color:#6B6873;"></ion-icon>
+      <input type="text" id="search-input" placeholder="Search dentists..." />
+      <button class="search-btn"><ion-icon name="search"></ion-icon></button>
+    </div>
+
+    <div class="specialty-info-card" id="specialty-info"></div>
+
+    <div class="section-header">
+      <h2 class="section-title">Dentistas</h2>
+    </div>
+
+    <div id="doctor-list"></div>
+
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item"><ion-icon name="home"></ion-icon></a>
+      <button class="nav-item active"><ion-icon name="search-outline"></ion-icon></button>
+      <a href="appointment.html" class="nav-item"><ion-icon name="calendar-outline"></ion-icon></a>
+      <a href="profile.html" class="nav-item"><ion-icon name="person-outline"></ion-icon></a>
+    </nav>
+
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script type="module">
+    import { getApprovedDentists } from './firebase-init.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const specialtyKey = params.get('tipo') || 'Ortodontia';
+    const info = specialtyInfo(specialtyKey);
+
+    document.getElementById('specialty-title').textContent = specialtyKey;
+    document.title = 'OdontoCare - ' + specialtyKey;
+
+    if (info) {
+      document.getElementById('specialty-info').innerHTML = `
+        <div class="specialty-info-icon" style="background:${info.bg};">${info.emoji}</div>
+        <p class="specialty-info-text">${info.description}</p>
+      `;
+    }
+
+    const listEl = document.getElementById('doctor-list');
+    listEl.innerHTML = '<p class="empty-state"><span>Carregando dentistas...</span></p>';
+
+    getApprovedDentists(specialtyKey, 50)
+      .then((doctors) => {
+        renderDoctorList(listEl, doctors);
+        setupSearch(document.getElementById('search-input'), listEl, doctors, doctors);
+      })
+      .catch((err) => {
+        listEl.innerHTML = `<p class="empty-state"><span>Não foi possível carregar (${err.message}).</span></p>`;
+      });
+  </script>
+</body>
+</html>
